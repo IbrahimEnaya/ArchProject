@@ -1,0 +1,136 @@
+module tst;
+  
+  reg [7:0] inn_t;
+  reg [7:0] key_t;
+  
+  wire [7:0] outt_t ;
+
+  
+  
+  xorr xr(outt_t, key_t,inn_t);
+  initial
+    begin
+      inn_t="i" ; key_t = "p";
+      #1 $display (" %b ",inn_t, "  %s  ",outt_t); 
+      
+      
+     /* in1_t=5;
+      #1 $display (" %b ",in1_t,"  %b ",out_t);*/ 
+      
+
+    end
+endmodule	// Code your design here
+module ceaser(inn ,key , outt);
+  
+  
+  input [7:0] inn;//1 char
+  reg [7:0] temp0;
+  reg [7:0] temp1;
+  reg [7:0] temp2 ;
+  output reg [7:0] outt; 
+  
+  input [7:0] key;
+  //parameter n=56;
+  always @ (*)
+  
+   begin 
+     if (inn >= "a"  ) 
+        temp0=inn-71;  //return the value of small letters
+      else if(inn < "a")
+      temp0=inn-65;    //return the value of capital letters 
+     
+     
+     if (key >= "a"  ) 
+        temp1=key-71;  //return the value of small letters
+     else if(key < "a")
+     temp1=key-65;  //return the value of capital letters 
+     
+     
+     temp2 =  ((temp0 + temp1) %52 ) ; // ceaser
+     outt = temp2;
+     //if(temp2 <26 ) outt = temp2 + 65 ;
+      //         else outt = temp2 + 71 ; // return to asscci
+     
+   end
+  
+
+  
+  
+endmodule
+/////////////////////////////////////////////////////
+
+module xorr(outt,key,in);
+  output  reg [7:0] outt;
+  wire [7:0] out ; 
+  input [7:0]in;
+  wire [7:0] inn;
+  input[7:0] key ; 
+  wire [7:0]x;
+   
+  assign x=2;
+  ceaser a (in ,key , inn );
+  
+  // bit wise XORing 
+  xor a(out[0],x[0],inn[0]);
+  xor b(out[1],x[1],inn[1]);
+  xor c(out[2],x[2],inn[2]);
+  xor d(out[3],x[3],inn[3]);
+  xor e(out[4],x[4],inn[4]);
+  xor f(out[5],x[5],inn[5]);
+  xor g(out[6],x[6],inn[6]);
+  xor h(out[7],x[7],inn[7]);
+  
+  //return to ascci 
+   always @ (*)
+  
+   begin 
+      outt = out ; 
+     if(out <26 ) outt = out + 65 ;
+       else outt = out + 71 ;
+   end
+  
+  
+endmodule
+//////////////////////////////////////////////
+
+module RightShift(in1,key,outp); 
+  input  [127:0] in1;
+  input  [127:0] key; 
+  output [127:0] outp;
+  wire [7:0] temp ;
+  
+   
+  xorr xr(outp[7:0],      key[127:120],in1[7:0]);
+  xorr xr1(outp[15:8],    key[127:120],in1[15:8]);
+  xorr xr2(outp[23:16],   key[127:120],in1[23:16]);
+  xorr xr3(outp[31:24],   key[127:120],in1[31:24]);
+  xorr xr4(outp[39:32],   key[127:120],in1[39:32]);
+  xorr xr5(outp[47:40],   key[127:120],in1[47:40]);
+  xorr xr6(outp[55:48],   key[127:120],in1[55:48]);
+  xorr xr7(outp[63:56],   key[127:120],in1[63:56]);
+  xorr xr8(outp[71:64],   key[127:120],in1[71:64]);
+  xorr xr9(outp[79:72],   key[127:120],in1[79:72]);
+  xorr xr10(outp[87:80],  key[127:120],in1[87:80]);
+  xorr xr11(outp[95:88],  key[127:120],in1[95:88]);
+  xorr xr12(outp[103:96], key[127:120],in1[103:96]);
+  xorr xr13(outp[111:104],key[127:120],in1[111:104]);
+  xorr xr14(outp[119:112],key[127:120],in1[119:112]);
+  xorr xr15(outp[127:120],key[127:120],in1[127:120]);
+  assign temp =in1[7:0]; 
+  assign outp={temp,in1[127:8]};  //or assign outp=in1>>1;  
+
+endmodule
+
+//////////////////////////////////////
+
+module swapping(inn ,key ,out);
+  reg [127:0]in ;
+  input [127:0] key;
+  input [127:0] inn;
+  output[127:0] out;
+  wire  [7:0] temp ;
+  
+ // RightShift rs(inn, key,out);
+  
+  assign out ={in[7:0],in[15:8] , in[23:16], in [31:24] , in[39:32],in[47:40],in[55:48],in[63:56],in[71:64] ,in[79:72] ,in[87:80] , in[95:88] ,in[103:96] ,in[111:104] ,in[119:112],in[127:120] };
+endmodule
