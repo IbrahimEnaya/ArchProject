@@ -1,0 +1,25 @@
+module testb;
+  reg [127:0] inpt1; 
+  wire [127:0] outp; 
+   
+  swapping a1(inpt1,outp); 
+ 
+initial begin  
+ 
+inpt1 = "TalaIbrahimArch2";   
+#1 
+  $display($time," %s ",inpt1," %s ",outp); 
+ 
+
+ 
+end  endmodule
+	// Code your design here
+module swapping(in , out);
+  input [127:0]in ;
+  output [127:0] out;
+  wire  [7:0] temp ;
+  
+  
+  assign out ={in[7:0],in[15:8] , in[23:16], in [31:24] , in[39:32],in[47:40],in[55:48],in[63:56],in[71:64] ,in[79:72] ,in[87:80] , in[95:88] ,in[103:96] ,in[111:104] ,in[119:112],in[127:120] };
+endmodule
+
