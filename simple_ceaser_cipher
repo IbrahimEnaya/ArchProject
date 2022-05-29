@@ -1,0 +1,49 @@
+// Code your testbench here
+// or browse Examples
+module test;
+  
+  reg [7:0] inn_t;
+  reg [7:0] key_t;
+  
+  wire [7:0] outt_t ;
+  
+  ceaser tst(inn_t, key_t, outt_t);
+  initial 
+  begin
+    
+    inn_t= "z" ;key_t = "S";
+    #1 $display (" output is %s ", outt_t);
+    
+  end
+endmodule	// Code your design here
+module ceaser(inn ,key , outt);
+  
+  input [7:0] inn;//1 char
+  reg [7:0] temp0;
+  reg [7:0] temp1;
+  reg [7:0] temp2 ;
+  output reg [7:0] outt; 
+  
+  input [7:0] key;
+  //parameter n=56;
+  always @ (*)
+  
+   begin 
+     if (inn >= "a"  ) 
+        temp0=inn-71;  //return the value of small letters
+      else if(inn < "a")
+      temp0=inn-65;    //return the value of capital letters 
+     
+     if (key >= "a"  ) 
+        temp1=key-71;  //return the value of small letters
+     else if(key < "a")
+      temp1=key-65;  //return the value of capital letters 
+     
+     temp2 =  ((temp0 + temp1) %52 ) ; // ceaser
+      
+     if(temp2 <26 ) outt = temp2 + 65 ;
+               else outt = temp2 + 71 ; // return to asscci
+     
+   end
+ 
+endmodule
