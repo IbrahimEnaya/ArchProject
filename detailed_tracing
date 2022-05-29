@@ -1,0 +1,1743 @@
+// Code your design here
+// Code your design here
+// Code your design here
+// Code your design here
+// Code your design here
+// Code your design here
+// Code your design here
+module crypto(cipher_text,CLK,text_block,key_block,mini,text_tracing,key_tracing,result_of_xor,result_of_shift_right,result_of_swapping,result_of_caesar,result_of_xor_ascii,result_of_caesar_stage2,mini2,result_of_xor_stage2,result_of_xor_ascii_stage2,result_of_shift_right_stage2,result_of_swapping_stage2,cipher_2_read_from_flipflop,cipher_1_read_from_flipflop,cipher1_write_on_flipflop,cipher2_write_on_flipflop,result_of_caesar_stage3,result_of_xor_stage3,result_of_xor_ascii_stage3,result_of_shift_right_stage3,result_of_swapping_stage3,cipher3_write_on_flipflop,cipher_3_read_from_flipflop,result_of_caesar_stage4,result_of_xor_stage4,result_of_xor_ascii_stage4,result_of_shift_right_stage4,result_of_swapping_stage4,cipher4_write_on_flipflop,cipher_4_read_from_flipflop,result_of_caesar_stage5,result_of_xor_stage5,result_of_xor_ascii_stage5,result_of_shift_right_stage5,result_of_swapping_stage5,cipher5_write_on_flipflop,cipher_5_read_from_flipflop,third_char_key,first_char_of_key,sec_char_of_key);
+  
+
+ 
+  input [0:279] key_block;
+  input [0:895] text_block;
+  input CLK;
+  
+  output [0:7] third_char_key;
+  
+  
+  output [0:7] first_char_of_key;
+  output [0:7] sec_char_of_key;
+  output [0:7] mini;
+  output [0:7] mini2;
+  output [0:127]text_tracing;
+  output [0:127] key_tracing;
+  
+  
+  
+  
+  output [0:127] result_of_caesar;
+  output [0:127] result_of_caesar_stage2;
+  output [0:127] result_of_caesar_stage3;
+  output [0:127] result_of_caesar_stage4;
+  output [0:127] result_of_caesar_stage5;
+
+  
+  output [0:127] result_of_xor;
+  output [0:127] result_of_xor_stage2;
+  output [0:127] result_of_xor_stage3;
+  output [0:127] result_of_xor_stage4;
+  output [0:127] result_of_xor_stage5;
+  
+  
+  output [0:127] result_of_xor_ascii;
+  output [0:127] result_of_xor_ascii_stage2;
+  output [0:127] result_of_xor_ascii_stage3;
+  output [0:127] result_of_xor_ascii_stage4;
+  output [0:127] result_of_xor_ascii_stage5;
+  
+  
+  output [0:127] result_of_shift_right;
+  output [0:127] result_of_shift_right_stage2;
+  output [0:127] result_of_shift_right_stage3;
+  output [0:127] result_of_shift_right_stage4;
+  output [0:127] result_of_shift_right_stage5;
+  
+  output [0:127] result_of_swapping;
+  output [0:127] result_of_swapping_stage2;
+  output [0:127] result_of_swapping_stage3;
+  output [0:127] result_of_swapping_stage4;
+  output [0:127] result_of_swapping_stage5;
+  
+  
+    
+  //cipher bfore always clock (WRITING ON FLIPFLOP)// 
+  
+  output [0:127] cipher1_write_on_flipflop;
+  output [0:127] cipher2_write_on_flipflop;
+  output [0:127] cipher3_write_on_flipflop;
+  output [0:127] cipher4_write_on_flipflop;
+  output [0:127] cipher5_write_on_flipflop;
+ // output [0:127] cipherr_5;
+  
+  
+  
+  //cipher after always block  (READING FROM FLIPPFLOP)//
+  output [0:127] cipher_1_read_from_flipflop;
+  output [0:127] cipher_2_read_from_flipflop;
+  output [0:127] cipher_3_read_from_flipflop;
+  output [0:127] cipher_4_read_from_flipflop;
+  output [0:127] cipher_5_read_from_flipflop;
+  //output [0:127] cipher_5;
+  
+  
+  
+
+  
+  
+ // output  reg [0:127] cipher_text;
+  
+  
+  output  [0:127] cipher_text;
+  //output reg [0:7] tt;
+   
+  reg  [0:7]pc=0; //counts from 0 to 111
+  reg  [0:8]pc_key=112; // counts from 112 to 146
+  
+  
+   // registers!!	
+  reg [0:127] pre_stage_text;
+  reg [0:127] reg_cipher1;
+  reg [0:127] reg_cipher2;
+  reg [0:127] reg_cipher3;
+  reg [0:127] reg_cipher4;
+  reg [0:127] reg_cipher5;
+  reg [0:127] reg_cipher_text;
+  
+  reg [0:39] pre_stage_key;
+  reg [0:39] reg_key1;
+  reg [0:39] reg_key2;
+  reg [0:39] reg_key3;
+  reg [0:39] reg_key4;
+  reg [0:39] reg_key5;
+  
+  
+  reg [0:127] reg_cipher1_before;
+  reg [0:127] reg_cipher2_before;
+  reg [0:127] reg_cipher3_before;
+  reg [0:127] reg_cipher4_before;
+  reg [0:127] reg_cipher5_before;
+
+
+  reg [0:127] reg_key1_before;
+  reg [0:127] reg_key2_before;
+  reg [0:127] reg_key3_before;
+  reg [0:127] reg_key4_before;
+  reg [0:127] reg_key5_before;
+  
+  
+  
+  
+  reg [0:127] partial_text;//receives 16 char
+  reg [0:39]  partial_key;//receives 5 char
+  
+   reg [0:7] mem [0:146];
+  
+  
+  ///////////////////////////////////////////////////
+  ///////MEMORY STAGE//////////////////////////////
+  ///////////////////////////////////////////////////
+  
+  
+  always @(posedge CLK)
+    begin
+      
+      
+      
+      mem[0]=text_block  [0:7];
+      mem[1]=text_block  [8:15];
+      mem[2]=text_block  [16:23];
+      mem[3]=text_block  [24:31];
+      mem[4]=text_block  [32:39];
+      mem[5]=text_block  [40:47];
+      mem[6]=text_block  [48:55];
+      mem[7]=text_block  [56:63];
+      mem[8]=text_block  [64:71];
+      mem[9]=text_block  [72:79]; 
+      mem[10]=text_block [80:87];
+      mem[11]=text_block [88:95];
+      mem[12]=text_block [96:103];
+      mem[13]=text_block [104:111];
+      mem[14]=text_block [112:119];
+      mem[15]=text_block [120:127];//TEXT 1
+      
+      
+     //pc=16
+      mem[16]=text_block [128:135];
+      mem[17]=text_block [136:143];
+      mem[18]=text_block [144:151];
+      mem[19]=text_block [152:159];
+      mem[20]=text_block [160:167];
+      mem[21]=text_block [168:175];
+      mem[22]=text_block [176:183];
+      mem[23]=text_block [184:191];
+      mem[24]=text_block [192:199];
+      mem[25]=text_block [200:207];
+      mem[26]=text_block [208:215];
+      mem[27]=text_block [216:223];
+      mem[28]=text_block [224:231];
+      mem[29]=text_block [132:239];
+      mem[30]=text_block [240:247];
+      mem[31]=text_block [248:255];//TEXT2
+      
+      //pc=32
+      mem[32]=text_block [256:263];
+      mem[33]=text_block [264:271];
+      mem[34]=text_block [272:279];
+      mem[35]=text_block [280:287];
+      mem[36]=text_block [288:295];
+      mem[37]=text_block [296:303];
+      mem[38]=text_block [304:311];
+      mem[39]=text_block [312:319];
+      mem[40]=text_block [320:327];
+      mem[41]=text_block [328:335];
+      mem[42]=text_block [336:343];
+      mem[43]=text_block [344:351];
+      mem[44]=text_block [352:359];
+      mem[45]=text_block [360:367];
+      mem[46]=text_block [368:375];
+      mem[47]=text_block [376:383];//TEXT3
+      
+      
+      //pc=48
+      mem[48]=text_block [384:391];
+      mem[49]=text_block [392:399];
+      mem[50]=text_block [400:407];
+      mem[51]=text_block [408:415];
+      mem[52]=text_block [417:423];
+      mem[53]=text_block [424:431];
+      mem[54]=text_block [432:439];
+      mem[55]=text_block [440:447];
+      mem[56]=text_block [448:455];
+      mem[57]=text_block [456:463];
+      mem[58]=text_block [464:471];
+      mem[59]=text_block [472:479];
+      mem[60]=text_block [480:487];
+      mem[61]=text_block [488:495];
+      mem[62]=text_block [496:503];
+      mem[63]=text_block [504:511];//TEXT4
+      
+      
+      //pc=64
+      mem[64]=text_block [512:519];
+      mem[65]=text_block [520:527];
+      mem[66]=text_block [528:535];
+      mem[67]=text_block [536:543];
+      mem[68]=text_block [544:551];
+      mem[69]=text_block [552:559];
+      mem[70]=text_block [560:567];
+      mem[71]=text_block [568:575];
+      mem[72]=text_block [576:583];
+      mem[73]=text_block [584:591];
+      mem[74]=text_block [592:599];
+      mem[75]=text_block [600:607];
+      mem[76]=text_block [608:615];
+      mem[77]=text_block [616:623];
+      mem[78]=text_block [624:631];
+      mem[79]=text_block [632:639];//TEXT5
+      
+      
+      //pc=80
+      mem[80]=text_block [640:647];
+      mem[81]=text_block [648:655];
+      mem[82]=text_block [656:663];
+      mem[83]=text_block [664:671];
+      mem[84]=text_block [672:679];
+      mem[85]=text_block [680:687];
+      mem[86]=text_block [688:695];
+      mem[87]=text_block [696:703];
+      mem[88]=text_block [704:711];
+      mem[89]=text_block [712:719];
+      mem[90]=text_block [720:727];
+      mem[91]=text_block [728:735];
+      mem[92]=text_block [736:743];
+      mem[93]=text_block [744:751];
+      mem[94]=text_block [752:759];
+      mem[95]=text_block [760:767];//TEXT6
+     
+      
+      //pc=96
+      mem[96]=text_block [768:775];
+      mem[97]=text_block [776:783];
+      mem[98]=text_block [784:791];
+      mem[99]=text_block [792:799];
+      mem[100]=text_block [800:807];
+      mem[101]=text_block [808:815];
+      mem[102]=text_block [816:823];
+      mem[103]=text_block [824:831];
+      mem[104]=text_block [832:839];
+      mem[105]=text_block [840:847];
+      mem[106]=text_block [848:855];
+      mem[107]=text_block [856:863];
+      mem[108]=text_block [864:871];
+      mem[109]=text_block [872:879];
+      mem[110]=text_block [880:887];
+      mem[111]=text_block [888:895];//TEXT7
+      
+      
+      
+      
+  //////////// KEY MEMORY/////////////////////
+      
+      
+      mem[112]=key_block [0:7];
+      mem[113]=key_block [8:15];
+      mem[114]=key_block [16:23];
+      mem[115]=key_block [24:31];
+      mem[116]=key_block [32:39];//KEY FOR TEXT1
+      
+      
+      mem[117]=key_block [40:47];
+      mem[118]=key_block [48:55];
+      mem[119]=key_block [56:63];
+      mem[120]=key_block [64:71];
+      mem[121]=key_block [72:79]; //KEY FOR TEXT2
+      
+      mem[122]=key_block [80:87];
+      mem[123]=key_block [88:95];
+      mem[124]=key_block [96:103];
+      mem[125]=key_block [104:111];
+      mem[126]=key_block [112:119];//KEY FOR TEXT3
+      
+      
+      mem[127]=key_block [120:127];
+      mem[128]=key_block [128:135];
+      mem[129]=key_block [136:143];
+      mem[130]=key_block [144:151];
+      mem[131]=key_block [152:159];//KEY FOR TEXT4 
+      
+      
+      mem[132]=key_block [160:167];
+      mem[133]=key_block [168:175];
+      mem[134]=key_block [176:183];
+      mem[135]=key_block [184:191];//KEY FOR TEXT5
+      mem[136]=key_block [192:199];
+      
+      
+      mem[137]=key_block [200:207];
+      mem[138]=key_block [208:215];
+      mem[139]=key_block [216:223];
+      mem[140]=key_block [224:231];
+      mem[141]=key_block [132:239]; //KEY FOR TEXT6
+      
+      mem[142]=key_block [240:247];
+      mem[143]=key_block [248:255];
+      mem[144]=key_block [256:263];
+      mem[145]=key_block [264:271];
+      mem[146]=key_block [272:279];//KEY FOR TEXT7
+      
+      
+      
+      pre_stage_text={ mem[pc]  ,mem[pc+1]  ,mem[pc+2]  ,mem[pc+3],mem[pc+4],
+                    mem[pc+5] ,mem[pc+6]  ,mem[pc+7]  ,mem[pc+8],
+                    mem[pc+9] ,mem[pc+10] ,mem[pc+11] ,mem[pc+12],
+                    mem[pc+13],mem[pc+14] ,mem[pc+15]};
+      
+  
+      
+      
+      pre_stage_key={ mem[pc_key],mem[pc_key+1],mem[pc_key+2],
+                   mem[pc_key+3],mem[pc_key+4] };
+      
+      
+       pc<=pc+16;
+      
+       pc_key<=pc_key+5;
+      
+       
+      
+                  
+    end
+  
+  
+  always @(posedge CLK)
+
+    begin
+      
+     #1 partial_text<= #4 pre_stage_text;
+        partial_key<=#4 pre_stage_key;
+      
+      
+    end
+  
+ 
+  
+  assign text_tracing=partial_text;
+  assign key_tracing=partial_key;
+  
+  wire [0:127]temp0;
+  wire [0:127]temp1;
+  wire [0:127]temp2;
+  
+  
+  assign first_char_of_key=partial_key[0:7];
+  // char1//
+  assign temp0[0:7] =(partial_text[0:7]  >= "a")?partial_text[0:7]-71:partial_text[0:7]-65;
+  assign temp1[0:7] =(partial_key[0:7] >= "a")?partial_key[0:7]-71:partial_key[0:7]-65;
+  assign   temp2[0:7]=  ((temp0[0:7] + temp1[0:7]) %52 ) ;
+  
+  
+ 
+   
+  //char2//
+  
+  assign temp0[8:15] =(partial_text[8:15]  >= "a")?partial_text[8:15]-71:partial_text[8:15]-65;
+  assign temp1[8:15] =(partial_key[0:7] >= "a")?partial_key[0:7]-71:partial_key[0:7]-65;
+  assign   temp2[8:15]=  ((temp0[8:15] + temp1[8:15]) %52 ) ;
+  
+  //char3///
+  
+  
+  
+  assign temp0[16:23] =(partial_text[16:23]  >= "a")?partial_text[16:23] -71:partial_text[16:23] -65;
+  assign temp1[16:23] =(partial_key [0:7]>= "a")?partial_key[0:7]-71:partial_key[0:7]-65;
+  assign   temp2[16:23]=  ((temp0[16:23] + temp1[16:23]) %52 ) ;
+
+  
+  
+  //char4//
+  
+  
+  assign temp0[24:31] =(partial_text[24:31]  >= "a")?partial_text[24:31]-71:partial_text[24:31]-65;
+  assign temp1[24:31] =(partial_key[0:7] >= "a")?partial_key[0:7]-71:partial_key[0:7]-65;
+  assign   temp2[24:31]=  ((temp0[24:31] + temp1[24:31]) %52 ) ;
+  
+  
+  
+   //char5//
+  
+  assign temp0[32:39] =(partial_text[32:39]  >= "a")?partial_text[32:39] -71:partial_text[32:39] -65;
+  assign temp1[32:39] =(partial_key[0:7] >= "a")?partial_key[0:7]-71:partial_key[0:7]-65;
+  assign   temp2[32:39]=  ((temp0[32:39] + temp1[32:39]) %52 ) ;
+  
+
+    //char6//
+  assign temp0[40:47] =(partial_text[40:47] >= "a")?partial_text[40:47]-71:partial_text[40:47]-65;
+  assign temp1[40:47] =(partial_key[0:7][0:7] >= "a")?partial_key[0:7]-71:partial_key[0:7][0:7]-65;
+  assign   temp2[40:47]=  ((temp0[40:47] + temp1[40:47]) %52 ) ;
+ 
+  
+  
+
+  //char7//
+  assign temp0[48:55] =(partial_text[48:55]  >= "a")?partial_text[48:55]-71:partial_text[48:55]-65;
+  assign temp1[48:55] =(partial_key[0:7] >= "a")?partial_key[0:7]-71:partial_key[0:7][0:7]-65;
+  assign   temp2[48:55]=  ((temp0[48:55] + temp1[48:55]) %52 ) ;
+  
+  
+  
+  
+   //char8//
+  assign temp0[56:63] =(partial_text[56:63]  >= "a")?partial_text[56:63]-71:partial_text[56:63]-65;
+  assign temp1[56:63] =(partial_key[0:7] >= "a")?partial_key[0:7]-71:partial_key[0:7]-65;
+  assign   temp2[56:63]=  ((temp0[56:63] + temp1[56:63]) %52 ) ;
+
+  
+  
+   //char9//
+  assign temp0[64:71] =(partial_text[64:71]  >= "a")?partial_text[64:71]-71:partial_text[64:71]-65;
+  assign temp1[64:71] =(partial_key[0:7] >= "a")?partial_key[0:7]-71:partial_key[0:7]-65;
+  assign   temp2[64:71]=  ((temp0 [64:71]+ temp1[64:71]) %52 ) ;
+
+  
+  
+  //char10//
+  assign temp0[72:79] =(partial_text[72:79]  >= "a")?partial_text[72:79]-71:partial_text[72:79]-65;
+  assign temp1[72:79] =(partial_key[0:7] >= "a")?partial_key[0:7]-71:partial_key[0:7]-65;
+  assign   temp2[72:79]=  ((temp0 [72:79]+ temp1[72:79]) %52 ) ;
+
+  
+  
+   //char11//
+  assign temp0[80:87] =(partial_text[80:87]  >= "a")?partial_text[80:87]-71:partial_text[80:87]-65;
+  assign temp1[80:87] =(partial_key [0:7]>= "a")?partial_key[0:7]-71:partial_key[0:7]-65;
+  assign   temp2[80:87]=  ((temp0[80:87] + temp1[80:87]) %52 ) ;
+ 
+  
+   //char12//
+  assign temp0[88:95] =(partial_text[88:95]  >= "a")?partial_text[88:95]-71:partial_text[88:95]-65;
+  assign temp1[88:95] =(partial_key[0:7] >= "a")?partial_key[0:7]-71:partial_key[0:7]-65;
+  assign   temp2[88:95]=  ((temp0[88:95] + temp1[88:95]) %52 ) ;
+  
+  //char13//
+  assign temp0[96:103] =(partial_text[96:103]  >= "a")?partial_text[96:103]-71:partial_text[96:103]-65;
+  assign temp1[96:103] =(partial_key[0:7] >= "a")?partial_key[0:7]-71:partial_key[0:7]-65;
+  assign   temp2[96:103]=  ((temp0[96:103] + temp1[96:103]) %52 ) ;
+ 
+ 
+  
+  
+  
+  
+    //char14//
+  assign temp0[104:111] =(partial_text[104:111]  >= "a")?partial_text[104:111]-71:partial_text[104:111]-65;
+  assign temp1 [104:111]=(partial_key[0:7] >= "a")?partial_key[0:7]-71:partial_key[0:7]-65;
+  assign   temp2[104:111]=  ((temp0[104:111] + temp1[104:111]) %52 ) ;
+
+  
+  
+  //char15//
+  assign temp0[112:119] =(partial_text[112:119]  >= "a")?partial_text[112:119]-71:partial_text[112:119]-65;
+  assign temp1[112:119] =(partial_key[0:7] >= "a")?partial_key[0:7]-71:partial_key[0:7]-65;
+  assign   temp2[112:119]=  ((temp0 [112:119]+ temp1[112:119]) %52 ) ;
+  
+
+  
+
+  
+   //char16//
+  assign temp0[120:127] =(partial_text[120:127]  >= "a")?partial_text[120:127]-71:partial_text[120:127]-65;
+  assign temp1 [120:127]=(partial_key[0:7] >= "a")?partial_key[0:7]-71:partial_key[0:7]-65;
+  assign   temp2[120:127]=  ((temp0[120:127] + temp1[120:127]) %52 ) ;
+  
+  
+
+ 
+  assign result_of_caesar=temp2;
+  
+   ////////////////////////////////////////////////
+  ///////////////XOR OPERATION///////////////////
+  
+  
+  
+  wire [0:127]x = 128'b00000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000010;
+  
+   assign result_of_xor = x^temp2; 
+  
+  
+  
+  //////////////////////////////////////////////////////
+  //////////////////back to ascii///////////////////////
+  //////////////////////////////////////////////////////
+  
+  
+  
+assign result_of_xor_ascii[0:7]=(result_of_xor[0:7]<26)?result_of_xor[0:7]+65:result_of_xor[0:7]+71  ;
+  
+  assign result_of_xor_ascii[8:15]=(result_of_xor[8:15]<26)?result_of_xor[8:15]+65:result_of_xor[8:15]+71  ;
+  
+  assign result_of_xor_ascii[16:23]=(result_of_xor[16:23]<26)?result_of_xor[16:23]+65:result_of_xor[16:23]+71  ;
+  
+  assign result_of_xor_ascii[24:31]=(result_of_xor[24:31]<26)?result_of_xor[24:31]+65:result_of_xor[24:31]+71  ;
+  
+  
+  
+  
+  assign result_of_xor_ascii[32:39]=(result_of_xor[32:39]<26)?result_of_xor[32:39]+65:result_of_xor[32:39]+71  ;
+  
+  assign result_of_xor_ascii[40:47]=(result_of_xor[40:47]<26)?result_of_xor[40:47]+65:result_of_xor[40:47]+71  ;
+  
+  assign result_of_xor_ascii[48:55]=(result_of_xor[48:55]<26)?result_of_xor[48:55]+65:result_of_xor[48:55]+71  ;
+  
+  assign result_of_xor_ascii[56:63]=(result_of_xor[56:63]<26)?result_of_xor[56:63]+65:result_of_xor[56:63]+71  ;
+  
+  
+  
+  
+  assign result_of_xor_ascii[64:71]=(result_of_xor[64:71]<26)?result_of_xor[64:71]+65:result_of_xor[64:71]+71  ;
+  
+  assign result_of_xor_ascii[72:79]=(result_of_xor[72:79]<26)?result_of_xor[72:79]+65:result_of_xor[72:79]+71  ;
+  
+  assign result_of_xor_ascii[80:87]=(result_of_xor[80:87]<26)?result_of_xor[80:87]+65:result_of_xor[80:87]+71  ;
+  
+  assign result_of_xor_ascii[88:95]=(result_of_xor[88:95]<26)?result_of_xor[88:95]+65:result_of_xor[88:95]+71  ;
+  
+  
+  
+  
+  
+  assign result_of_xor_ascii[96:103]=(result_of_xor[96:103]<26)?result_of_xor[96:103]+65:result_of_xor[96:103]+71  ;
+  
+  
+  assign result_of_xor_ascii[104:111]=(result_of_xor[104:111]<26)?result_of_xor[104:111]+65:result_of_xor[104:111]+71  ;
+  
+  assign result_of_xor_ascii[112:119]=(result_of_xor[112:119]<26)?result_of_xor[112:119]+65:result_of_xor[112:119]+71  ;
+  
+  assign result_of_xor_ascii[120:127]=(result_of_xor[120:127]<26)?result_of_xor[120:127]+65:result_of_xor[120:127]+71  ;
+  
+  
+  
+  /////////////////////////////////////////////////////
+  ////////////////////SHIFT TO THE RIGHT///////////////
+  /////////////////////////////////////////////////////
+  
+  
+  assign result_of_shift_right={result_of_xor_ascii[120:127],result_of_xor_ascii[0:119]};
+  
+  
+  //////////////////////////////////////////////////////
+  //////////////////SWAPPING////////////////////////////
+  //////////////////////////////////////////////////////
+  
+  
+  
+  assign result_of_swapping ={result_of_shift_right[120:127],result_of_shift_right[112:119],result_of_shift_right[104:111],result_of_shift_right[96:103],result_of_shift_right[88:95],result_of_shift_right[80:87],result_of_shift_right[72:79],result_of_shift_right[64:71],result_of_shift_right[56:63],result_of_shift_right[48:55],result_of_shift_right[40:47],result_of_shift_right[32:39],result_of_shift_right[24:31],result_of_shift_right[16:23],result_of_shift_right[8:15],result_of_shift_right[0:7]};
+  
+  
+integer flag=0;
+  
+       assign cipher1_write_on_flipflop=result_of_swapping;
+
+  
+  ///writing on flipflop//
+  always @(negedge CLK)
+
+    begin
+      
+     reg_cipher1_before=result_of_swapping;
+     reg_key1_before=partial_key;
+      flag=1;
+      
+     
+    end
+  //READING FROM FLIPFLOP//
+  
+  always@(posedge CLK)
+    begin
+     if(flag==1)
+       begin
+        reg_cipher1=reg_cipher1_before;
+        reg_key1=reg_key1_before;
+       end
+   end
+  
+    assign cipher_1_read_from_flipflop=reg_key1;
+
+  
+  /////////////////////////////////////////////////////
+  //////////////////STAGE2/////////////////////////////
+  /////////////////////////////////////////////////////
+  
+ 
+  
+    
+  wire [0:127]temp0_stage2;
+  wire [0:127]temp1_stage2;
+  wire [0:127]temp2_stage2;
+  
+  // char1//
+  
+  
+  assign sec_char_of_key=reg_key1[8:15];
+  assign temp0_stage2[0:7] =(reg_cipher1[0:7]  >= "a")?reg_cipher1[0:7]-71:reg_cipher1[0:7]-65;
+  
+  assign temp1_stage2[0:7] =(reg_key1[8:15] >= "a")?reg_key1[8:15]-71:reg_key1[8:15]-65;
+  assign mini2=reg_key1[8:15];
+
+  
+
+  assign   temp2_stage2[0:7]=  ((temp0_stage2[0:7] + temp1_stage2[0:7]) %52 ) ;
+  
+  
+  assign mini[0:7]=temp2_stage2[0:7];
+   
+  //char2//
+  
+  assign temp0_stage2[8:15] =(reg_cipher1[8:15]  >= "a")?reg_cipher1[8:15]-71:reg_cipher1[8:15]-65;
+  assign temp1_stage2[8:15] =(reg_key1[8:15] >= "a")?reg_key1[8:15]-71:reg_key1[8:15]-65;
+  assign   temp2_stage2[8:15]=  ((temp0_stage2[8:15] + temp1_stage2[8:15]) %52 ) ;
+  
+  //char3///
+  
+  
+  
+  assign temp0_stage2[16:23] =(reg_cipher1[16:23]  >= "a")?reg_cipher1[16:23] -71:reg_cipher1[16:23] -65;
+  assign temp1_stage2[16:23] =(reg_key1[8:15]>= "a")?reg_key1[8:15]-71:reg_key1[8:15]-65;
+  assign   temp2_stage2[16:23]=  ((temp0_stage2[16:23] + temp1_stage2[16:23]) %52 ) ;
+
+  
+  
+  //char4//
+  
+  
+  assign temp0_stage2[24:31] =(reg_cipher1[24:31]  >= "a")?reg_cipher1[24:31]-71:reg_cipher1[24:31]-65;
+  assign temp1_stage2[24:31] =(reg_key1[8:15] >= "a")?reg_key1[8:15]-71:reg_key1[8:15]-65;
+  assign   temp2_stage2[24:31]=  ((temp0_stage2[24:31] + temp1_stage2[24:31]) %52 ) ;
+
+  
+  
+   //char5//
+  
+  assign temp0_stage2[32:39] =(reg_cipher1[32:39]  >= "a")?reg_cipher1[32:39] -71:reg_cipher1[32:39] -65;
+  assign temp1_stage2[32:39] =(reg_key1[8:15] >= "a")?reg_key1[8:15]-71:reg_key1[8:15]-65;
+  assign   temp2_stage2[32:39]=  ((temp0_stage2[32:39] + temp1_stage2[32:39]) %52 ) ;
+
+    //char6//
+  assign temp0_stage2[40:47] =(reg_cipher1[40:47] >= "a")?reg_cipher1[40:47]-71:reg_cipher1[40:47]-65;
+  assign temp1_stage2[40:47] =(reg_key1[8:15] >= "a")?reg_key1[8:15]-71:reg_key1[8:15]-65;
+  assign   temp2_stage2[40:47]=  ((temp0_stage2[40:47] + temp1_stage2[40:47]) %52 ) ;
+
+  
+
+  //char7//
+  assign temp0_stage2[48:55] =(reg_cipher1[48:55]  >= "a")?reg_cipher1[48:55]-71:reg_cipher1[48:55]-65;
+  assign temp1_stage2[48:55] =(reg_key1[8:15] >= "a")?reg_key1[8:15]-71:reg_key1[8:15]-65;
+  assign   temp2_stage2[48:55]=  ((temp0_stage2[48:55] + temp1_stage2[48:55]) %52 ) ;
+
+  
+  
+  
+   //char8//
+  assign temp0_stage2[56:63] =(reg_cipher1[56:63]  >= "a")?reg_cipher1[56:63]-71:reg_cipher1[56:63]-65;
+  assign temp1_stage2[56:63] =(reg_key1[8:15] >= "a")?reg_key1[8:15]-71:reg_key1[8:15]-65;
+  assign   temp2_stage2[56:63]=  ((temp0_stage2[56:63] + temp1_stage2[56:63]) %52 ) ;
+
+  
+   //char9//
+  assign temp0_stage2[64:71] =(reg_cipher1[64:71]  >= "a")?reg_cipher1[64:71]-71:reg_cipher1[64:71]-65;
+  assign temp1_stage2[64:71] =(reg_key1[8:15] >= "a")?reg_key1[8:15]-71:reg_key1[8:15]-65;
+  assign   temp2_stage2[64:71]=  ((temp0_stage2 [64:71]+ temp1_stage2[64:71]) %52 ) ;
+ 
+  
+  
+  //char10//
+  assign temp0_stage2[72:79] =(reg_cipher1[72:79]  >= "a")?reg_cipher1[72:79]-71:reg_cipher1[72:79]-65;
+  assign temp1_stage2[72:79] =(reg_key1[8:15] >= "a")?reg_key1[8:15]-71:reg_key1[8:15]-65;
+  assign   temp2_stage2[72:79]=  ((temp0_stage2 [72:79]+ temp1_stage2[72:79]) %52 ) ;
+ 
+  
+  
+   //char11//
+  assign temp0_stage2[80:87] =(reg_cipher1[80:87]  >= "a")?reg_cipher1[80:87]-71:reg_cipher1[80:87]-65;
+  assign temp1_stage2[80:87] =(reg_key1[8:15]>= "a")?reg_key1[8:15] -71:reg_key1[8:15]-65;
+  assign   temp2_stage2[80:87]=  ((temp0_stage2[80:87] + temp1_stage2[80:87]) %52 ) ;
+ 
+  
+   //char12//
+  assign temp0_stage2[88:95] =(reg_cipher1[88:95]  >= "a")?reg_cipher1[88:95]-71:reg_cipher1[88:95]-65;
+  assign temp1_stage2[88:95] =(reg_key1[8:15] >= "a")?reg_key1[8:15]-71:reg_key1[8:15]-65;
+  assign   temp2_stage2[88:95]=  ((temp0_stage2[88:95] + temp1_stage2[88:95]) %52 ) ;
+ 
+  
+  //char13//
+  assign temp0_stage2[96:103] =(reg_cipher1[96:103]  >= "a")?reg_cipher1[96:103]-71:reg_cipher1[96:103]-65;
+  assign temp1_stage2[96:103] =(reg_key1[8:15] >= "a")?reg_key1[8:15]-71:reg_key1[8:15]-65;
+  assign   temp2_stage2[96:103]=  ((temp0_stage2[96:103] + temp1_stage2[96:103]) %52 ) ;
+ 
+ 
+  
+  
+  
+  
+    //char14//
+  assign temp0_stage2[104:111] =(reg_cipher1[104:111]  >= "a")?reg_cipher1[104:111]-71:reg_cipher1[104:111]-65;
+  assign temp1_stage2 [104:111]=(reg_key1[8:15] >= "a")?reg_key1[8:15]-71:reg_key1[8:15]-65;
+  assign   temp2_stage2[104:111]=  ((temp0_stage2[104:111] + temp1_stage2[104:111]) %52 ) ;
+
+  
+  
+  //char15//
+  assign temp0_stage2[112:119] =(reg_cipher1[112:119]  >= "a")?reg_cipher1[112:119]-71:reg_cipher1[112:119]-65;
+  assign temp1_stage2[112:119] =(reg_key1[8:15] >= "a")?reg_key1[8:15]-71:reg_key1[8:15]-65;
+  assign   temp2_stage2[112:119]=  ((temp0_stage2 [112:119]+ temp1_stage2[112:119]) %52 ) ;
+  
+
+  
+  
+
+  
+   //char16//
+  assign temp0_stage2[120:127] =(reg_cipher1[120:127]  >= "a")?reg_cipher1[120:127]-71:reg_cipher1[120:127]-65;
+  assign temp1_stage2 [120:127]=(reg_key1[8:15] >= "a")?reg_key1[8:15]-71:reg_key1[8:15]-65;
+  assign   temp2_stage2[120:127]=  ((temp0_stage2[120:127] + temp1_stage2[120:127]) %52 ) ;
+  
+  
+  
+
+  
+  
+ 
+  assign result_of_caesar_stage2=temp2_stage2;
+  
+   ////////////////////////////////////////////////
+  ///////////////XOR OPERATION///////////////////
+    
+  wire [0:127]x_stage2 = 128'b00000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000010;
+  
+   assign result_of_xor_stage2 = x_stage2^temp2_stage2;
+  
+  
+  
+  
+
+  //////////////////////////////////////////////////////
+  //////////////////back to ascii///////////////////////
+  //////////////////////////////////////////////////////
+  
+  
+  
+assign result_of_xor_ascii_stage2[0:7]=(result_of_xor_stage2[0:7]<26)?result_of_xor_stage2[0:7]+65:result_of_xor_stage2[0:7]+71  ;
+  
+  assign result_of_xor_ascii_stage2[8:15]=(result_of_xor_stage2[8:15]<26)?result_of_xor_stage2[8:15]+65:result_of_xor_stage2[8:15]+71  ;
+  
+  assign result_of_xor_ascii_stage2[16:23]=(result_of_xor_stage2[16:23]<26)?result_of_xor_stage2[16:23]+65:result_of_xor_stage2[16:23]+71  ;
+  
+  assign result_of_xor_ascii_stage2[24:31]=(result_of_xor_stage2[24:31]<26)?result_of_xor_stage2[24:31]+65:result_of_xor_stage2[24:31]+71  ;
+  
+  
+  
+  
+  assign result_of_xor_ascii_stage2[32:39]=(result_of_xor_stage2[32:39]<26)?result_of_xor_stage2[32:39]+65:result_of_xor_stage2[32:39]+71  ;
+  
+  assign result_of_xor_ascii_stage2[40:47]=(result_of_xor_stage2[40:47]<26)?result_of_xor_stage2[40:47]+65:result_of_xor_stage2[40:47]+71  ;
+  
+  assign result_of_xor_ascii_stage2[48:55]=(result_of_xor_stage2[48:55]<26)?result_of_xor_stage2[48:55]+65:result_of_xor_stage2[48:55]+71  ;
+  
+  assign result_of_xor_ascii_stage2[56:63]=(result_of_xor_stage2[56:63]<26)?result_of_xor_stage2[56:63]+65:result_of_xor_stage2[56:63]+71  ;
+  
+  
+  
+  
+  assign result_of_xor_ascii_stage2[64:71]=(result_of_xor_stage2[64:71]<26)?result_of_xor_stage2[64:71]+65:result_of_xor_stage2[64:71]+71  ;
+  
+  assign result_of_xor_ascii_stage2[72:79]=(result_of_xor_stage2[72:79]<26)?result_of_xor_stage2[72:79]+65:result_of_xor_stage2[72:79]+71  ;
+  
+  assign result_of_xor_ascii_stage2[80:87]=(result_of_xor_stage2[80:87]<26)?result_of_xor_stage2[80:87]+65:result_of_xor_stage2[80:87]+71  ;
+  
+  assign result_of_xor_ascii_stage2[88:95]=(result_of_xor_stage2[88:95]<26)?result_of_xor_stage2[88:95]+65:result_of_xor_stage2[88:95]+71  ;
+  
+  
+  
+  
+  
+  assign result_of_xor_ascii_stage2[96:103]=(result_of_xor_stage2[96:103]<26)?result_of_xor_stage2[96:103]+65:result_of_xor_stage2[96:103]+71  ;
+  
+  
+  assign result_of_xor_ascii_stage2[104:111]=(result_of_xor_stage2[104:111]<26)?result_of_xor_stage2[104:111]+65:result_of_xor_stage2[104:111]+71  ;
+  
+  assign result_of_xor_ascii_stage2[112:119]=(result_of_xor_stage2[112:119]<26)?result_of_xor_stage2[112:119]+65:result_of_xor_stage2[112:119]+71  ;
+  
+  assign result_of_xor_ascii_stage2[120:127]=(result_of_xor_stage2[120:127]<26)?result_of_xor_stage2[120:127]+65:result_of_xor_stage2[120:127]+71  ;
+
+ 
+   //////////////////////////////////////////////////////
+  ////////////////////SHIFT TO THE RIGHT//////////////
+  /////////////////////////////////////////////////////
+  
+  
+  assign result_of_shift_right_stage2={result_of_xor_ascii_stage2[120:127],result_of_xor_ascii_stage2[0:119]};
+  
+  
+   //////////////////////////////////////////////////////
+  //////////////////SWAPPING////////////////////////////
+  //////////////////////////////////////////////////////
+  
+  
+  
+  assign result_of_swapping_stage2 ={result_of_shift_right_stage2[120:127],result_of_shift_right_stage2[112:119],result_of_shift_right_stage2[104:111],result_of_shift_right_stage2[96:103],result_of_shift_right_stage2[88:95],result_of_shift_right_stage2[80:87],result_of_shift_right_stage2[72:79],result_of_shift_right_stage2[64:71],result_of_shift_right_stage2[56:63],result_of_shift_right_stage2[48:55],result_of_shift_right_stage2[40:47],result_of_shift_right_stage2[32:39],result_of_shift_right_stage2[24:31],result_of_shift_right_stage2[16:23],result_of_shift_right_stage2[8:15],result_of_shift_right_stage2[0:7]};
+  
+  
+   assign cipher2_write_on_flipflop=result_of_swapping_stage2;
+  
+  
+  
+  
+   always @(negedge CLK)
+     
+
+    begin
+      
+     reg_cipher2_before=result_of_swapping_stage2;
+     reg_key2_before=reg_key1;
+      flag=1;
+      
+     
+    end
+  
+  
+  
+  always@(posedge CLK)
+    begin
+     if(flag==1)
+       begin
+        reg_cipher2=reg_cipher2_before;
+        reg_key2=reg_key2_before;
+       end
+      
+   end
+  
+    assign cipher_2_read_from_flipflop=reg_key2;
+
+  
+  //////////////////////////////////////////////////////////////////
+  ///////////////////////////STAGE3///////////////////////////////
+    
+  wire [0:127]temp0_stage3;
+  wire [0:127]temp1_stage3;
+  wire [0:127]temp2_stage3;
+  
+  // char1//
+  
+  
+
+  assign temp0_stage3[0:7] =(reg_cipher2[0:7]  >= "a")?reg_cipher2[0:7]-71:reg_cipher2[0:7]-65;
+  
+  assign temp1_stage3[0:7] =(reg_key2[16:23] >= "a")?reg_key2[16:23]-71:reg_key2[16:23]-65;
+  //assign miniii2=reg_key2[16:23];
+
+  assign third_char_key=reg_key2[16:23];
+
+  assign   temp2_stage3[0:7]=  ((temp0_stage3[0:7] + temp1_stage3[0:7]) %52 ) ;
+  
+  
+  assign mini[0:7]=reg_key2[0:7];
+   
+  //char2//
+  
+  assign temp0_stage3[8:15] =(reg_cipher2[8:15]  >= "a")?reg_cipher2[8:15]-71:reg_cipher2[8:15]-65;
+  assign temp1_stage3[8:15] =(reg_key2[16:23] >= "a")?reg_key2[16:23]-71:reg_key2[16:23]-65;
+  assign   temp2_stage3[8:15]=  ((temp0_stage3[8:15] + temp1_stage3[8:15]) %52 ) ;
+  
+  //char3///
+  
+  
+  
+  assign temp0_stage3[16:23] =(reg_cipher2[16:23]  >= "a")?reg_cipher2[16:23] -71:reg_cipher2[16:23] -65;
+  assign temp1_stage3[16:23] =(reg_key2[16:23]>= "a")?reg_key2[16:23]-71:reg_key2[16:23]-65;
+  assign   temp2_stage3[16:23]=  ((temp0_stage3[16:23] + temp1_stage3[16:23]) %52 ) ;
+
+  
+  
+  //char4//
+  
+  
+  assign temp0_stage3[24:31] =(reg_cipher2[24:31]  >= "a")?reg_cipher2[24:31]-71:reg_cipher2[24:31]-65;
+  assign temp1_stage3[24:31] =(reg_key2[16:23] >= "a")?reg_key2[16:23]-71:reg_key2[16:23]-65;
+  assign   temp2_stage3[24:31]=  ((temp0_stage3[24:31] + temp1_stage3[24:31]) %52 ) ;
+
+  
+  
+   //char5//
+  
+  assign temp0_stage3[32:39] =(reg_cipher2[32:39]  >= "a")?reg_cipher2[32:39] -71:reg_cipher2[32:39] -65;
+  assign temp1_stage3[32:39] =(reg_key2[16:23] >= "a")?reg_key2[16:23]-71:reg_key2[16:23]-65;
+  assign   temp2_stage3[32:39]=  ((temp0_stage3[32:39] + temp1_stage3[32:39]) %52 ) ;
+
+    //char6//
+  assign temp0_stage3[40:47] =(reg_cipher2[40:47] >= "a")?reg_cipher2[40:47]-71:reg_cipher2[40:47]-65;
+  assign temp1_stage3[40:47] =(reg_key2[16:23] >= "a")?reg_key2[16:23]-71:reg_key2[16:23]-65;
+  assign   temp2_stage3[40:47]=  ((temp0_stage3[40:47] + temp1_stage3[40:47]) %52 ) ;
+
+  
+
+  //char7//
+  assign temp0_stage3[48:55] =(reg_cipher2[48:55]  >= "a")?reg_cipher2[48:55]-71:reg_cipher2[48:55]-65;
+  assign temp1_stage3[48:55] =(reg_key2[16:23] >= "a")?reg_key2[16:23]-71:reg_key2[16:23]-65;
+  assign   temp2_stage3[48:55]=  ((temp0_stage3[48:55] + temp1_stage3[48:55]) %52 ) ;
+
+  
+  
+  
+   //char8//
+  assign temp0_stage3[56:63] =(reg_cipher2[56:63]  >= "a")?reg_cipher2[56:63]-71:reg_cipher2[56:63]-65;
+  assign temp1_stage3[56:63] =(reg_key2[16:23] >= "a")?reg_key2[16:23]-71:reg_key2[16:23]-65;
+  assign   temp2_stage3[56:63]=  ((temp0_stage3[56:63] + temp1_stage3[56:63]) %52 ) ;
+
+  
+   //char9//
+  assign temp0_stage3[64:71] =(reg_cipher2[64:71]  >= "a")?reg_cipher2[64:71]-71:reg_cipher2[64:71]-65;
+  assign temp1_stage3[64:71] =(reg_key2[16:23] >= "a")?reg_key2[16:23]-71:reg_key2[16:23]-65;
+  assign   temp2_stage3[64:71]=  ((temp0_stage3 [64:71]+ temp1_stage3[64:71]) %52 ) ;
+ 
+  
+  
+  //char10//
+  assign temp0_stage3[72:79] =(reg_cipher2[72:79]  >= "a")?reg_cipher2[72:79]-71:reg_cipher2[72:79]-65;
+  assign temp1_stage3[72:79] =(reg_key2[16:23] >= "a")?reg_key2[16:23]-71:reg_key2[16:23]-65;
+  assign   temp2_stage3[72:79]=  ((temp0_stage3 [72:79]+ temp1_stage3[72:79]) %52 ) ;
+ 
+  
+  
+   //char11//
+  assign temp0_stage3[80:87] =(reg_cipher2[80:87]  >= "a")?reg_cipher2[80:87]-71:reg_cipher2[80:87]-65;
+  assign temp1_stage3[80:87] =(reg_key2[16:23]>= "a")?reg_key2[16:23] -71:reg_key2[16:23]-65;
+  assign   temp2_stage3[80:87]=  ((temp0_stage3[80:87] + temp1_stage3[80:87]) %52 ) ;
+ 
+  
+   //char12//
+  assign temp0_stage3[88:95] =(reg_cipher2[88:95]  >= "a")?reg_cipher2[88:95]-71:reg_cipher2[88:95]-65;
+  assign temp1_stage3[88:95] =(reg_key2[16:23] >= "a")?reg_key2[16:23]-71:reg_key2[16:23]-65;
+  assign   temp2_stage3[88:95]=  ((temp0_stage3[88:95] + temp1_stage3[88:95]) %52 ) ;
+ 
+  
+  //char13//
+  assign temp0_stage3[96:103] =(reg_cipher2[96:103]  >= "a")?reg_cipher2[96:103]-71:reg_cipher2[96:103]-65;
+  assign temp1_stage3[96:103] =(reg_key2[16:23] >= "a")?reg_key2[16:23]-71:reg_key2[16:23]-65;
+  assign   temp2_stage3[96:103]=  ((temp0_stage3[96:103] + temp1_stage3[96:103]) %52 ) ;
+ 
+ 
+  
+  
+  
+  
+    //char14//
+  assign temp0_stage3[104:111] =(reg_cipher2[104:111]  >= "a")?reg_cipher2[104:111]-71:reg_cipher2[104:111]-65;
+  assign temp1_stage3 [104:111]=(reg_key2[16:23] >= "a")?reg_key2[16:23]-71:reg_key2[16:23]-65;
+  assign   temp2_stage3[104:111]=  ((temp0_stage3[104:111] + temp1_stage3[104:111]) %52 ) ;
+
+  
+  
+  //char15//
+  assign temp0_stage3[112:119] =(reg_cipher2[112:119]  >= "a")?reg_cipher2[112:119]-71:reg_cipher2[112:119]-65;
+  assign temp1_stage3[112:119] =(reg_key2[16:23] >= "a")?reg_key2[16:23]-71:reg_key2[16:23]-65;
+  assign   temp2_stage3[112:119]=  ((temp0_stage3 [112:119]+ temp1_stage3[112:119]) %52 ) ;
+  
+
+  
+  
+
+  
+   //char16//
+  assign temp0_stage3[120:127] =(reg_cipher2[120:127]  >= "a")?reg_cipher2[120:127]-71:reg_cipher2[120:127]-65;
+  assign temp1_stage3 [120:127]=(reg_key2[16:23] >= "a")?reg_key2[16:23]-71:reg_key2[16:23]-65;
+  assign   temp2_stage3[120:127]=  ((temp0_stage3[120:127] + temp1_stage3[120:127]) %52 ) ;
+  
+  
+ 
+  assign result_of_caesar_stage3=temp2_stage3;
+  
+  ///////////////////////XOR OPERATION/////////////////////
+  wire [0:127]x_stage3 = 128'b00000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000010;
+  
+   assign result_of_xor_stage3 = x_stage3^temp2_stage3;
+  
+  
+  //////////////////////////////////////////////////////
+  //////////////////back to ascii///////////////////////
+  //////////////////////////////////////////////////////
+  
+  
+  
+  assign result_of_xor_ascii_stage3[0:7]=(result_of_xor_stage3[0:7]<26)?result_of_xor_stage3[0:7]+65:result_of_xor_stage3[0:7]+71  ;
+  
+  assign result_of_xor_ascii_stage3[8:15]=(result_of_xor_stage3[8:15]<26)?result_of_xor_stage3[8:15]+65:result_of_xor_stage3[8:15]+71  ;
+  
+  assign result_of_xor_ascii_stage3[16:23]=(result_of_xor_stage3[16:23]<26)?result_of_xor_stage3[16:23]+65:result_of_xor_stage3[16:23]+71  ;
+  
+  assign result_of_xor_ascii_stage3[24:31]=(result_of_xor_stage3[24:31]<26)?result_of_xor_stage3[24:31]+65:result_of_xor_stage3[24:31]+71  ;
+  
+  
+  
+  
+  assign result_of_xor_ascii_stage3[32:39]=(result_of_xor_stage3[32:39]<26)?result_of_xor_stage3[32:39]+65:result_of_xor_stage3[32:39]+71  ;
+  
+  assign result_of_xor_ascii_stage3[40:47]=(result_of_xor_stage3[40:47]<26)?result_of_xor_stage3[40:47]+65:result_of_xor_stage3[40:47]+71  ;
+  
+  assign result_of_xor_ascii_stage3[48:55]=(result_of_xor_stage3[48:55]<26)?result_of_xor_stage3[48:55]+65:result_of_xor_stage3[48:55]+71  ;
+  
+  assign result_of_xor_ascii_stage3[56:63]=(result_of_xor_stage3[56:63]<26)?result_of_xor_stage3[56:63]+65:result_of_xor_stage3[56:63]+71  ;
+  
+  
+  
+  
+  assign result_of_xor_ascii_stage3[64:71]=(result_of_xor_stage3[64:71]<26)?result_of_xor_stage3[64:71]+65:result_of_xor_stage3[64:71]+71  ;
+  
+  assign result_of_xor_ascii_stage3[72:79]=(result_of_xor_stage3[72:79]<26)?result_of_xor_stage3[72:79]+65:result_of_xor_stage3[72:79]+71  ;
+  
+  assign result_of_xor_ascii_stage3[80:87]=(result_of_xor_stage3[80:87]<26)?result_of_xor_stage3[80:87]+65:result_of_xor_stage3[80:87]+71  ;
+  
+  assign result_of_xor_ascii_stage3[88:95]=(result_of_xor_stage3[88:95]<26)?result_of_xor_stage3[88:95]+65:result_of_xor_stage3[88:95]+71  ;
+  
+  
+  
+  
+  
+  assign result_of_xor_ascii_stage3[96:103]=(result_of_xor_stage3[96:103]<26)?result_of_xor_stage3[96:103]+65:result_of_xor_stage3[96:103]+71  ;
+  
+  
+  assign result_of_xor_ascii_stage3[104:111]=(result_of_xor_stage3[104:111]<26)?result_of_xor_stage3[104:111]+65:result_of_xor_stage3[104:111]+71  ;
+  
+  assign result_of_xor_ascii_stage3[112:119]=(result_of_xor_stage3[112:119]<26)?result_of_xor_stage3[112:119]+65:result_of_xor_stage3[112:119]+71  ;
+  
+  assign result_of_xor_ascii_stage3[120:127]=(result_of_xor_stage3[120:127]<26)?result_of_xor_stage3[120:127]+65:result_of_xor_stage3[120:127]+71  ;
+
+ 
+  ////////////////////SHIFT TO THE RIGHT//////////////
+  /////////////////////////////////////////////////////
+  
+  
+  assign result_of_shift_right_stage3={result_of_xor_ascii_stage3[120:127],result_of_xor_ascii_stage3[0:119]};
+  
+   //////////////////////////////////////////////////////
+  //////////////////SWAPPING////////////////////////////
+  //////////////////////////////////////////////////////
+  
+  
+  
+  assign result_of_swapping_stage3 ={result_of_shift_right_stage3[120:127],result_of_shift_right_stage3[112:119],result_of_shift_right_stage3[104:111],result_of_shift_right_stage3[96:103],result_of_shift_right_stage3[88:95],result_of_shift_right_stage3[80:87],result_of_shift_right_stage3[72:79],result_of_shift_right_stage3[64:71],result_of_shift_right_stage3[56:63],result_of_shift_right_stage3[48:55],result_of_shift_right_stage3[40:47],result_of_shift_right_stage3[32:39],result_of_shift_right_stage3[24:31],result_of_shift_right_stage3[16:23],result_of_shift_right_stage3[8:15],result_of_shift_right_stage3[0:7]};
+  
+  
+   assign cipher3_write_on_flipflop=result_of_swapping_stage3;
+  
+   always @(negedge CLK)
+
+    begin
+      
+     reg_cipher3_before=result_of_swapping_stage3;
+     reg_key3_before=reg_key2;
+      flag=1;
+      
+     
+    end
+  
+  
+  
+  always@(posedge CLK)
+    begin
+     if(flag==1)
+       begin
+        reg_cipher3=reg_cipher3_before;
+        reg_key3=reg_key3_before;
+       end
+      
+   end
+  
+    assign cipher_3_read_from_flipflop=reg_cipher3;
+  
+  
+
+  //////////////////////////////////////////////////////////////////
+  ///////////////////////////STAGE4///////////////////////////////
+    
+  wire [0:127]temp0_stage4;
+  wire [0:127]temp1_stage4;
+  wire [0:127]temp2_stage4;
+  
+  // char1//
+  
+  
+
+  assign temp0_stage4[0:7] =(reg_cipher3[0:7]  >= "a")?reg_cipher3[0:7]-71:reg_cipher3[0:7]-65;
+  
+  assign temp1_stage4[0:7] =(reg_key3[24:31] >= "a")?reg_key3[24:31]-71:reg_key3[24:31]-65;
+  assign mini2=reg_key3[24:31];
+
+  
+
+  assign   temp2_stage4[0:7]=  ((temp0_stage4[0:7] + temp1_stage4[0:7]) %52 ) ;
+  
+  
+  assign mini[0:7]=temp2_stage4[0:7];
+   
+  //char2//
+  
+  assign temp0_stage4[8:15] =(reg_cipher3[8:15]  >= "a")?reg_cipher3[8:15]-71:reg_cipher3[8:15]-65;
+  assign temp1_stage4[8:15] =(reg_key3[24:31] >= "a")?reg_key3[24:31]-71:reg_key3[24:31]-65;
+  assign   temp2_stage4[8:15]=  ((temp0_stage4[8:15] + temp1_stage4[8:15]) %52 ) ;
+  
+  //char3///
+  
+  
+  
+  assign temp0_stage4[16:23] =(reg_cipher3[16:23]  >= "a")?reg_cipher3[16:23] -71:reg_cipher3[16:23] -65;
+  assign temp1_stage4[16:23] =(reg_key3[24:31]>= "a")?reg_key3[24:31]-71:reg_key3[24:31]-65;
+  assign   temp2_stage4[16:23]=  ((temp0_stage4[16:23] + temp1_stage4[16:23]) %52 ) ;
+
+  
+  
+  //char4//
+  
+  
+  assign temp0_stage4[24:31] =(reg_cipher3[24:31]  >= "a")?reg_cipher3[24:31]-71:reg_cipher3[24:31]-65;
+  assign temp1_stage4[24:31] =(reg_key3[24:31] >= "a")?reg_key3[24:31]-71:reg_key3[24:31]-65;
+  assign   temp2_stage4[24:31]=  ((temp0_stage4[24:31] + temp1_stage4[24:31]) %52 ) ;
+
+  
+  
+   //char5//
+  
+  assign temp0_stage4[32:39] =(reg_cipher3[32:39]  >= "a")?reg_cipher3[32:39] -71:reg_cipher3[32:39] -65;
+  assign temp1_stage4[32:39] =(reg_key3[24:31] >= "a")?reg_key3[24:31]-71:reg_key3[24:31]-65;
+  assign   temp2_stage4[32:39]=  ((temp0_stage4[32:39] + temp1_stage4[32:39]) %52 ) ;
+
+    //char6//
+  assign temp0_stage4[40:47] =(reg_cipher3[40:47] >= "a")?reg_cipher3[40:47]-71:reg_cipher3[40:47]-65;
+  assign temp1_stage4[40:47] =(reg_key3[24:31] >= "a")?reg_key3[24:31]-71:reg_key3[24:31]-65;
+  assign   temp2_stage4[40:47]=  ((temp0_stage4[40:47] + temp1_stage4[40:47]) %52 ) ;
+
+  
+
+  //char7//
+  assign temp0_stage4[48:55] =(reg_cipher3[48:55]  >= "a")?reg_cipher3[48:55]-71:reg_cipher3[48:55]-65;
+  assign temp1_stage4[48:55] =(reg_key3[24:31] >= "a")?reg_key3[24:31]-71:reg_key3[24:31]-65;
+  assign   temp2_stage4[48:55]=  ((temp0_stage4[48:55] + temp1_stage4[48:55]) %52 ) ;
+
+  
+  
+  
+   //char8//
+  assign temp0_stage4[56:63] =(reg_cipher3[56:63]  >= "a")?reg_cipher3[56:63]-71:reg_cipher3[56:63]-65;
+  assign temp1_stage4[56:63] =(reg_key3[24:31] >= "a")?reg_key3[24:31]-71:reg_key3[24:31]-65;
+  assign   temp2_stage4[56:63]=  ((temp0_stage4[56:63] + temp1_stage4[56:63]) %52 ) ;
+
+  
+   //char9//
+  assign temp0_stage4[64:71] =(reg_cipher3[64:71]  >= "a")?reg_cipher3[64:71]-71:reg_cipher3[64:71]-65;
+  assign temp1_stage4[64:71] =(reg_key3[24:31] >= "a")?reg_key3[24:31]-71:reg_key3[24:31]-65;
+  assign   temp2_stage4[64:71]=  ((temp0_stage4 [64:71]+ temp1_stage4[64:71]) %52 ) ;
+ 
+  
+  
+  //char10//
+  assign temp0_stage4[72:79] =(reg_cipher3[72:79]  >= "a")?reg_cipher3[72:79]-71:reg_cipher3[72:79]-65;
+  assign temp1_stage4[72:79] =(reg_key3[24:31] >= "a")?reg_key3[24:31]-71:reg_key3[24:31]-65;
+  assign   temp2_stage4[72:79]=  ((temp0_stage4 [72:79]+ temp1_stage4[72:79]) %52 ) ;
+ 
+  
+  
+   //char11//
+  assign temp0_stage4[80:87] =(reg_cipher3[80:87]  >= "a")?reg_cipher3[80:87]-71:reg_cipher3[80:87]-65;
+  assign temp1_stage4[80:87] =(reg_key3[24:31]>= "a")?reg_key3[24:31] -71:reg_key3[24:31]-65;
+  assign   temp2_stage4[80:87]=  ((temp0_stage4[80:87] + temp1_stage4[80:87]) %52 ) ;
+ 
+  
+   //char12//
+  assign temp0_stage4[88:95] =(reg_cipher3[88:95]  >= "a")?reg_cipher3[88:95]-71:reg_cipher3[88:95]-65;
+  assign temp1_stage4[88:95] =(reg_key3[24:31] >= "a")?reg_key3[24:31]-71:reg_key3[24:31]-65;
+  assign   temp2_stage4[88:95]=  ((temp0_stage4[88:95] + temp1_stage4[88:95]) %52 ) ;
+ 
+  
+  //char13//
+  assign temp0_stage4[96:103] =(reg_cipher3[96:103]  >= "a")?reg_cipher3[96:103]-71:reg_cipher3[96:103]-65;
+  assign temp1_stage4[96:103] =(reg_key3[24:31] >= "a")?reg_key3[24:31]-71:reg_key3[24:31]-65;
+  assign   temp2_stage4[96:103]=  ((temp0_stage4[96:103] + temp1_stage4[96:103]) %52 ) ;
+ 
+ 
+  
+  
+  
+  
+    //char14//
+  assign temp0_stage4[104:111] =(reg_cipher3[104:111]  >= "a")?reg_cipher3[104:111]-71:reg_cipher3[104:111]-65;
+  assign temp1_stage4 [104:111]=(reg_key3[24:31] >= "a")?reg_key3[24:31]-71:reg_key3[24:31]-65;
+  assign   temp2_stage4[104:111]=  ((temp0_stage4[104:111] + temp1_stage4[104:111]) %52 ) ;
+
+  
+  
+  //char15//
+  assign temp0_stage4[112:119] =(reg_cipher3[112:119]  >= "a")?reg_cipher3[112:119]-71:reg_cipher3[112:119]-65;
+  assign temp1_stage4[112:119] =(reg_key3[24:31] >= "a")?reg_key3[24:31]-71:reg_key3[24:31]-65;
+  assign   temp2_stage4[112:119]=  ((temp0_stage4 [112:119]+ temp1_stage4[112:119]) %52 ) ;
+  
+
+  
+  
+
+  
+   //char16//
+  assign temp0_stage4[120:127] =(reg_cipher3[120:127]  >= "a")?reg_cipher3[120:127]-71:reg_cipher3[120:127]-65;
+  assign temp1_stage4 [120:127]=(reg_key3[24:31] >= "a")?reg_key3[24:31]-71:reg_key3[24:31]-65;
+  assign   temp2_stage4[120:127]=  ((temp0_stage4[120:127] + temp1_stage4[120:127]) %52 ) ;
+  
+  
+ 
+  assign result_of_caesar_stage4=temp2_stage4;
+  
+  
+    ////////////////////////////////////////////////
+  ///////////////XOR OPERATION///////////////////
+    
+  wire [0:127]x_stage4 = 128'b00000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000010;
+  
+   assign result_of_xor_stage4 = x_stage4^temp2_stage4;
+  
+   //////////////////back to ascii///////////////////////
+  //////////////////////////////////////////////////////
+  
+  
+  
+  assign result_of_xor_ascii_stage4[0:7]=(result_of_xor_stage4[0:7]<26)?result_of_xor_stage4[0:7]+65:result_of_xor_stage4[0:7]+71  ;
+  
+  assign result_of_xor_ascii_stage4[8:15]=(result_of_xor_stage4[8:15]<26)?result_of_xor_stage4[8:15]+65:result_of_xor_stage4[8:15]+71  ;
+  
+  assign result_of_xor_ascii_stage4[16:23]=(result_of_xor_stage4[16:23]<26)?result_of_xor_stage4[16:23]+65:result_of_xor_stage4[16:23]+71  ;
+  
+  assign result_of_xor_ascii_stage4[24:31]=(result_of_xor_stage4[24:31]<26)?result_of_xor_stage4[24:31]+65:result_of_xor_stage4[24:31]+71  ;
+  
+  
+  
+  
+  assign result_of_xor_ascii_stage4[32:39]=(result_of_xor_stage4[32:39]<26)?result_of_xor_stage4[32:39]+65:result_of_xor_stage4[32:39]+71  ;
+  
+  assign result_of_xor_ascii_stage4[40:47]=(result_of_xor_stage4[40:47]<26)?result_of_xor_stage4[40:47]+65:result_of_xor_stage4[40:47]+71  ;
+  
+  assign result_of_xor_ascii_stage4[48:55]=(result_of_xor_stage4[48:55]<26)?result_of_xor_stage4[48:55]+65:result_of_xor_stage4[48:55]+71  ;
+  
+  assign result_of_xor_ascii_stage4[56:63]=(result_of_xor_stage4[56:63]<26)?result_of_xor_stage4[56:63]+65:result_of_xor_stage4[56:63]+71  ;
+  
+  
+  
+  
+  assign result_of_xor_ascii_stage4[64:71]=(result_of_xor_stage4[64:71]<26)?result_of_xor_stage4[64:71]+65:result_of_xor_stage4[64:71]+71  ;
+  
+  assign result_of_xor_ascii_stage4[72:79]=(result_of_xor_stage4[72:79]<26)?result_of_xor_stage4[72:79]+65:result_of_xor_stage4[72:79]+71  ;
+  
+  assign result_of_xor_ascii_stage4[80:87]=(result_of_xor_stage4[80:87]<26)?result_of_xor_stage4[80:87]+65:result_of_xor_stage4[80:87]+71  ;
+  
+  assign result_of_xor_ascii_stage4[88:95]=(result_of_xor_stage4[88:95]<26)?result_of_xor_stage4[88:95]+65:result_of_xor_stage4[88:95]+71  ;
+  
+  
+  
+  
+  
+  assign result_of_xor_ascii_stage4[96:103]=(result_of_xor_stage4[96:103]<26)?result_of_xor_stage4[96:103]+65:result_of_xor_stage4[96:103]+71  ;
+  
+  
+  assign result_of_xor_ascii_stage4[104:111]=(result_of_xor_stage4[104:111]<26)?result_of_xor_stage4[104:111]+65:result_of_xor_stage4[104:111]+71  ;
+  
+  assign result_of_xor_ascii_stage4[112:119]=(result_of_xor_stage4[112:119]<26)?result_of_xor_stage4[112:119]+65:result_of_xor_stage4[112:119]+71  ;
+  
+  assign result_of_xor_ascii_stage4[120:127]=(result_of_xor_stage4[120:127]<26)?result_of_xor_stage4[120:127]+65:result_of_xor_stage4[120:127]+71  ;
+
+ 
+  ////////////////////SHIFT TO THE RIGHT//////////////
+  /////////////////////////////////////////////////////
+  
+  
+  assign result_of_shift_right_stage4={result_of_xor_ascii_stage4[120:127],result_of_xor_ascii_stage4[0:119]};
+  
+  
+  
+  
+  
+  assign result_of_swapping_stage4 ={result_of_shift_right_stage4[120:127],result_of_shift_right_stage4[112:119],result_of_shift_right_stage4[104:111],result_of_shift_right_stage4[96:103],result_of_shift_right_stage4[88:95],result_of_shift_right_stage4[80:87],result_of_shift_right_stage4[72:79],result_of_shift_right_stage4[64:71],result_of_shift_right_stage4[56:63],result_of_shift_right_stage4[48:55],result_of_shift_right_stage4[40:47],result_of_shift_right_stage4[32:39],result_of_shift_right_stage4[24:31],result_of_shift_right_stage4[16:23],result_of_shift_right_stage4[8:15],result_of_shift_right_stage4[0:7]};
+  
+  
+  
+  assign cipher4_write_on_flipflop=result_of_swapping_stage4;
+  
+  
+  
+  
+  always @(negedge CLK)
+    begin
+      
+     reg_cipher4_before=result_of_swapping_stage4;
+     reg_key4_before=reg_key3;
+      flag=1;
+     
+      
+     
+    end
+  
+  
+  
+  always@(posedge CLK)
+    begin
+     if(flag==1)
+       begin
+        reg_cipher4=reg_cipher4_before;
+        reg_key4=reg_key4_before;
+       end
+   end
+  
+    assign cipher_4_read_from_flipflop=reg_cipher4;
+  
+  
+  //////////////////////////////////////////////////////////////////
+  ///////////////////////////STAGE5///////////////////////////////
+    
+  wire [0:127]temp0_stage5;
+  wire [0:127]temp1_stage5;
+  wire [0:127]temp2_stage5;
+  
+  // char1//
+  
+  
+
+  assign temp0_stage5[0:7] =(reg_cipher4[0:7]  >= "a")?reg_cipher4[0:7]-71:reg_cipher4[0:7]-65;
+  
+  assign temp1_stage5[0:7] =(reg_key4[32:39] >= "a")?reg_key4[32:39]-71:reg_key4[32:39]-65;
+  assign mini2=reg_key4[32:39];
+
+  
+
+  assign   temp2_stage5[0:7]=  ((temp0_stage5[0:7] + temp1_stage5[0:7]) %52 ) ;
+  
+  
+  assign mini[0:7]=temp2_stage5[0:7];
+   
+  //char2//
+  
+  assign temp0_stage5[8:15] =(reg_cipher4[8:15]  >= "a")?reg_cipher4[8:15]-71:reg_cipher4[8:15]-65;
+  assign temp1_stage5[8:15] =(reg_key4[32:39] >= "a")?reg_key4[32:39]-71:reg_key4[32:39]-65;
+  assign   temp2_stage5[8:15]=  ((temp0_stage5[8:15] + temp1_stage5[8:15]) %52 ) ;
+  
+  //char3///
+  
+  
+  
+  assign temp0_stage5[16:23] =(reg_cipher4[16:23]  >= "a")?reg_cipher4[16:23] -71:reg_cipher4[16:23] -65;
+  assign temp1_stage5[16:23] =(reg_key4[32:39]>= "a")?reg_key4[32:39]-71:reg_key4[32:39]-65;
+  assign   temp2_stage5[16:23]=  ((temp0_stage5[16:23] + temp1_stage5[16:23]) %52 ) ;
+
+  
+  
+  //char4//
+  
+  
+  assign temp0_stage5[24:31] =(reg_cipher4[24:31]  >= "a")?reg_cipher4[24:31]-71:reg_cipher4[24:31]-65;
+  assign temp1_stage5[24:31] =(reg_key4[32:39] >= "a")?reg_key4[32:39]-71:reg_key4[32:39]-65;
+  assign   temp2_stage5[24:31]=  ((temp0_stage5[24:31] + temp1_stage5[24:31]) %52 ) ;
+
+  
+  
+   //char5//
+  
+  assign temp0_stage5[32:39] =(reg_cipher4[32:39]  >= "a")?reg_cipher4[32:39] -71:reg_cipher4[32:39] -65;
+  assign temp1_stage5[32:39] =(reg_key4[32:39] >= "a")?reg_key4[32:39]-71:reg_key4[32:39]-65;
+  assign   temp2_stage5[32:39]=  ((temp0_stage5[32:39] + temp1_stage5[32:39]) %52 ) ;
+
+    //char6//
+  assign temp0_stage5[40:47] =(reg_cipher4[40:47] >= "a")?reg_cipher4[40:47]-71:reg_cipher4[40:47]-65;
+  assign temp1_stage5[40:47] =(reg_key4[32:39] >= "a")?reg_key4[32:39]-71:reg_key4[32:39]-65;
+  assign   temp2_stage5[40:47]=  ((temp0_stage5[40:47] + temp1_stage5[40:47]) %52 ) ;
+
+  
+
+  //char7//
+  assign temp0_stage5[48:55] =(reg_cipher4[48:55]  >= "a")?reg_cipher4[48:55]-71:reg_cipher4[48:55]-65;
+  assign temp1_stage5[48:55] =(reg_key4[32:39] >= "a")?reg_key4[32:39]-71:reg_key4[32:39]-65;
+  assign   temp2_stage5[48:55]=  ((temp0_stage5[48:55] + temp1_stage5[48:55]) %52 ) ;
+
+  
+  
+  
+   //char8//
+  assign temp0_stage5[56:63] =(reg_cipher4[56:63]  >= "a")?reg_cipher4[56:63]-71:reg_cipher4[56:63]-65;
+  assign temp1_stage5[56:63] =(reg_key4[32:39] >= "a")?reg_key4[32:39]-71:reg_key4[32:39]-65;
+  assign   temp2_stage5[56:63]=  ((temp0_stage5[56:63] + temp1_stage5[56:63]) %52 ) ;
+
+  
+   //char9//
+  assign temp0_stage5[64:71] =(reg_cipher4[64:71]  >= "a")?reg_cipher4[64:71]-71:reg_cipher4[64:71]-65;
+  assign temp1_stage5[64:71] =(reg_key4[32:39] >= "a")?reg_key4[32:39]-71:reg_key4[32:39]-65;
+  assign   temp2_stage5[64:71]=  ((temp0_stage5 [64:71]+ temp1_stage5[64:71]) %52 ) ;
+ 
+  
+  
+  //char10//
+  assign temp0_stage5[72:79] =(reg_cipher4[72:79]  >= "a")?reg_cipher4[72:79]-71:reg_cipher4[72:79]-65;
+  assign temp1_stage5[72:79] =(reg_key4[32:39] >= "a")?reg_key4[32:39]-71:reg_key4[32:39]-65;
+  assign   temp2_stage5[72:79]=  ((temp0_stage5 [72:79]+ temp1_stage5[72:79]) %52 ) ;
+ 
+  
+  
+   //char11//
+  assign temp0_stage5[80:87] =(reg_cipher4[80:87]  >= "a")?reg_cipher4[80:87]-71:reg_cipher4[80:87]-65;
+  assign temp1_stage5[80:87] =(reg_key4[32:39]>= "a")?reg_key4[32:39] -71:reg_key4[32:39]-65;
+  assign   temp2_stage5[80:87]=  ((temp0_stage5[80:87] + temp1_stage5[80:87]) %52 ) ;
+ 
+  
+   //char12//
+  assign temp0_stage5[88:95] =(reg_cipher4[88:95]  >= "a")?reg_cipher4[88:95]-71:reg_cipher4[88:95]-65;
+  assign temp1_stage5[88:95] =(reg_key4[32:39] >= "a")?reg_key4[32:39]-71:reg_key4[32:39]-65;
+  assign   temp2_stage5[88:95]=  ((temp0_stage5[88:95] + temp1_stage5[88:95]) %52 ) ;
+ 
+  
+  //char13//
+  assign temp0_stage5[96:103] =(reg_cipher4[96:103]  >= "a")?reg_cipher4[96:103]-71:reg_cipher4[96:103]-65;
+  assign temp1_stage5[96:103] =(reg_key4[32:39] >= "a")?reg_key4[32:39]-71:reg_key4[32:39]-65;
+  assign   temp2_stage5[96:103]=  ((temp0_stage5[96:103] + temp1_stage5[96:103]) %52 ) ;
+ 
+ 
+  
+  
+  
+  
+    //char14//
+  assign temp0_stage5[104:111] =(reg_cipher4[104:111]  >= "a")?reg_cipher4[104:111]-71:reg_cipher4[104:111]-65;
+  assign temp1_stage5 [104:111]=(reg_key4[32:39] >= "a")?reg_key4[32:39]-71:reg_key4[32:39]-65;
+  assign   temp2_stage5[104:111]=  ((temp0_stage5[104:111] + temp1_stage5[104:111]) %52 ) ;
+
+  
+  
+  //char15//
+  assign temp0_stage5[112:119] =(reg_cipher4[112:119]  >= "a")?reg_cipher4[112:119]-71:reg_cipher4[112:119]-65;
+  assign temp1_stage5[112:119] =(reg_key4[32:39] >= "a")?reg_key4[32:39]-71:reg_key4[32:39]-65;
+  assign   temp2_stage5[112:119]=  ((temp0_stage5 [112:119]+ temp1_stage5[112:119]) %52 ) ;
+  
+
+  
+  
+
+  
+   //char16//
+  assign temp0_stage5[120:127] =(reg_cipher4[120:127]  >= "a")?reg_cipher4[120:127]-71:reg_cipher4[120:127]-65;
+  assign temp1_stage5 [120:127]=(reg_key4[32:39] >= "a")?reg_key4[32:39]-71:reg_key4[32:39]-65;
+  assign   temp2_stage5[120:127]=  ((temp0_stage5[120:127] + temp1_stage5[120:127]) %52 ) ;
+  
+  
+ 
+  assign result_of_caesar_stage5=temp2_stage5;
+  
+   ////////////////////////////////////////////////
+  ///////////////XOR OPERATION///////////////////
+    
+  wire [0:127]x_stage5 = 128'b00000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000010000000100000001000000010;
+  
+   assign result_of_xor_stage5 = x_stage5^temp2_stage5;
+  
+  
+   //////////////////back to ascii///////////////////////
+  //////////////////////////////////////////////////////
+  
+  
+  
+  assign result_of_xor_ascii_stage5[0:7]=(result_of_xor_stage5[0:7]<26)?result_of_xor_stage5[0:7]+65:result_of_xor_stage5[0:7]+71  ;
+  
+  assign result_of_xor_ascii_stage5[8:15]=(result_of_xor_stage5[8:15]<26)?result_of_xor_stage5[8:15]+65:result_of_xor_stage5[8:15]+71  ;
+  
+  assign result_of_xor_ascii_stage5[16:23]=(result_of_xor_stage5[16:23]<26)?result_of_xor_stage5[16:23]+65:result_of_xor_stage5[16:23]+71  ;
+  
+  assign result_of_xor_ascii_stage5[24:31]=(result_of_xor_stage5[24:31]<26)?result_of_xor_stage5[24:31]+65:result_of_xor_stage5[24:31]+71  ;
+  
+  
+  
+  
+  assign result_of_xor_ascii_stage5[32:39]=(result_of_xor_stage5[32:39]<26)?result_of_xor_stage5[32:39]+65:result_of_xor_stage5[32:39]+71  ;
+  
+  assign result_of_xor_ascii_stage5[40:47]=(result_of_xor_stage5[40:47]<26)?result_of_xor_stage5[40:47]+65:result_of_xor_stage5[40:47]+71  ;
+  
+  assign result_of_xor_ascii_stage5[48:55]=(result_of_xor_stage5[48:55]<26)?result_of_xor_stage5[48:55]+65:result_of_xor_stage5[48:55]+71  ;
+  
+  assign result_of_xor_ascii_stage5[56:63]=(result_of_xor_stage5[56:63]<26)?result_of_xor_stage5[56:63]+65:result_of_xor_stage5[56:63]+71  ;
+  
+  
+  
+  
+  assign result_of_xor_ascii_stage5[64:71]=(result_of_xor_stage5[64:71]<26)?result_of_xor_stage5[64:71]+65:result_of_xor_stage5[64:71]+71  ;
+  
+  assign result_of_xor_ascii_stage5[72:79]=(result_of_xor_stage5[72:79]<26)?result_of_xor_stage5[72:79]+65:result_of_xor_stage5[72:79]+71  ;
+  
+  assign result_of_xor_ascii_stage5[80:87]=(result_of_xor_stage5[80:87]<26)?result_of_xor_stage5[80:87]+65:result_of_xor_stage5[80:87]+71  ;
+  
+  assign result_of_xor_ascii_stage5[88:95]=(result_of_xor_stage5[88:95]<26)?result_of_xor_stage5[88:95]+65:result_of_xor_stage5[88:95]+71  ;
+  
+  
+  
+  
+  
+  assign result_of_xor_ascii_stage5[96:103]=(result_of_xor_stage5[96:103]<26)?result_of_xor_stage5[96:103]+65:result_of_xor_stage5[96:103]+71  ;
+  
+  
+  assign result_of_xor_ascii_stage5[104:111]=(result_of_xor_stage5[104:111]<26)?result_of_xor_stage5[104:111]+65:result_of_xor_stage5[104:111]+71  ;
+  
+  assign result_of_xor_ascii_stage5[112:119]=(result_of_xor_stage5[112:119]<26)?result_of_xor_stage5[112:119]+65:result_of_xor_stage5[112:119]+71  ;
+  
+  assign result_of_xor_ascii_stage5[120:127]=(result_of_xor_stage5[120:127]<26)?result_of_xor_stage5[120:127]+65:result_of_xor_stage5[120:127]+71  ;
+
+ 
+  
+  ////////////////////SHIFT TO THE RIGHT//////////////
+  /////////////////////////////////////////////////////
+  
+  
+  assign result_of_shift_right_stage5={result_of_xor_ascii_stage5[120:127],result_of_xor_ascii_stage5[0:119]};
+  
+  
+  
+  
+   
+   //////////////////////////////////////////////////////
+  //////////////////SWAPPING////////////////////////////
+  //////////////////////////////////////////////////////
+  
+  
+  
+  assign result_of_swapping_stage5 ={result_of_shift_right_stage5[120:127],result_of_shift_right_stage5[112:119],result_of_shift_right_stage5[104:111],result_of_shift_right_stage5[96:103],result_of_shift_right_stage5[88:95],result_of_shift_right_stage5[80:87],result_of_shift_right_stage5[72:79],result_of_shift_right_stage5[64:71],result_of_shift_right_stage5[56:63],result_of_shift_right_stage5[48:55],result_of_shift_right_stage5[40:47],result_of_shift_right_stage5[32:39],result_of_shift_right_stage5[24:31],result_of_shift_right_stage5[16:23],result_of_shift_right_stage5[8:15],result_of_shift_right_stage5[0:7]};
+  
+  
+   assign cipher5_write_on_flipflop=result_of_swapping_stage5;
+  
+   
+   always @(negedge CLK)
+
+    begin
+      
+     reg_cipher5_before=result_of_swapping_stage5;
+     reg_key5_before=reg_key4;
+      flag=1;
+      
+     
+      
+    end
+  
+   
+  always@(posedge CLK)
+    begin
+     if(flag==1)
+       begin
+        reg_cipher5=reg_cipher5_before;
+        reg_key5=reg_key5_before;
+       end
+      
+   end
+  
+    assign cipher_5_read_from_flipflop=reg_cipher5;
+
+  
+ 
+
+  
+  
+
+endmodule
+
+
+
+// Code your testbench here
+// or browse Examples
+
+// Code your testbench here
+// or browse Examples
+// Code your testbench here
+// or browse Examples
+
+// Code your testbench here
+// or browse Examples
+
+
+module tst;
+
+
+  reg [0:895] text_block_t;
+  reg [0:279] key_block_t;
+  reg CLK_t;
+  
+  wire [0:7] first_char_of_key_t;
+  wire [0:7] sec_char_of_key_t;
+   wire [0:7] third_char_key_t;
+ // wire [0:7] tt_t;
+  
+  wire [0:127] cipher_text_t;
+  wire [0:7] mini_t;
+  wire [0:7] mini2_t;
+  wire [0:127] text_tracing_t;
+  wire [0:127] key_tracing_t;
+  
+  
+  wire [0:127] result_of_caesar_t;
+  wire [0:127] result_of_caesar_stage2_t;
+  wire [0:127] result_of_caesar_stage3_t;
+  wire [0:127] result_of_caesar_stage4_t;
+  wire [0:127] result_of_caesar_stage5_t;
+  
+  
+  
+  wire [0:127] result_of_xor_t;
+  wire [0:127] result_of_xor_stage2_t;
+  wire [0:127] result_of_xor_stage3_t; 
+  wire [0:127] result_of_xor_stage4_t;
+  wire [0:127] result_of_xor_stage5_t;
+  
+  
+  
+  wire [0:127] result_of_xor_ascii_t;
+  wire [0:127] result_of_xor_ascii_stage2_t;
+  wire [0:127] result_of_xor_ascii_stage3_t;
+  wire [0:127] result_of_xor_ascii_stage4_t;
+  wire [0:127] result_of_xor_ascii_stage5_t;
+  
+  
+  wire [0:127] result_of_shift_right_t;
+  wire [0:127] result_of_shift_right_stage2_t;
+  wire [0:127] result_of_shift_right_stage3_t;
+  wire [0:127] result_of_shift_right_stage4_t;
+  wire [0:127] result_of_shift_right_stage5_t;
+  
+  
+  wire [0:127] result_of_swapping_t;
+  wire [0:127] result_of_swapping_stage2_t;
+  wire [0:127] result_of_swapping_stage3_t;
+  wire [0:127] result_of_swapping_stage4_t;
+  wire [0:127] result_of_swapping_stage5_t;
+  
+  //before alwaysblock (WRITING ON FLIPFLOP)//
+  
+  wire [0:127] cipher1_write_on_flipflop_t;
+  wire [0:127] cipher2_write_on_flipflop_t;
+  wire [0:127] cipher3_write_on_flipflop_t;
+  wire [0:127] cipher4_write_on_flipflop_t;
+  wire [0:127] cipher5_write_on_flipflop_t;
+  
+  
+  //after alwaysblock (READING FROM FLIPFLOP)//
+  
+  wire [0:127] cipher_1_read_from_flipflop_t;
+  wire [0:127] cipher_2_read_from_flipflop_t;
+  wire [0:127] cipher_3_read_from_flipflop_t;
+  wire [0:127] cipher_4_read_from_flipflop_t;
+  wire [0:127] cipher_5_read_from_flipflop_t;
+
+  
+  
+  
+  
+  crypto tst(cipher_text_t,CLK_t,text_block_t,key_block_t,mini_t,text_tracing_t,key_tracing_t,result_of_xor_t,result_of_shift_right_t,result_of_swapping_t,result_of_caesar_t,result_of_xor_ascii_t,result_of_caesar_stage2_t,mini2_t,result_of_xor_stage2_t,result_of_xor_ascii_stage2_t,result_of_shift_right_stage2_t,result_of_swapping_stage2_t,cipher_2_read_from_flipflop_t,cipher_1_read_from_flipflop_t,cipher1_write_on_flipflop_t,cipher2_write_on_flipflop_t,result_of_caesar_stage3_t,result_of_xor_stage3_t,result_of_xor_ascii_stage3_t,result_of_shift_right_stage3_t,result_of_swapping_stage3_t,cipher3_write_on_flipflop_t,cipher_3_read_from_flipflop_t,result_of_caesar_stage4_t,result_of_xor_stage4_t,result_of_xor_ascii_stage4_t,result_of_shift_right_stage4_t,result_of_swapping_stage4_t,cipher4_write_on_flipflop_t,cipher_4_read_from_flipflop_t,result_of_caesar_stage5_t,result_of_xor_stage5_t,result_of_xor_ascii_stage5_t,result_of_shift_right_stage5_t,result_of_swapping_stage5_t,cipher5_write_on_flipflop_t,cipher_5_read_from_flipflop_t,third_char_key_t,first_char_of_key_t,sec_char_of_key_t);
+  
+  
+  
+  initial CLK_t=0;
+  
+    always #8000 CLK_t=~CLK_t;
+    initial
+      begin
+
+         $dumpfile("dump.vcd");
+      $dumpvars(1);
+ #4000 text_block_t="TalaRaedHashemmmTalaEmadIbraheemJoudBaniIsmaeiilDanaSameerhaddadRundHaniiRasheedBanaSamerElayyanLunarJamalSalame";
+        
+        
+key_block_t="StudentsOfComputerEngineeringMajorr";
+ 
+        
+        #16000 $display ("** FIRST CLK CYCLE** \n //Tracing of text1// \n Memory stage:\n"," Partial_Text is: %s \n", text_tracing_t," Partial_key is:%s \n", key_tracing_t,"ROUND1/STAGE1 OF TEXT1: \n","first_char_of_key: %s \n", first_char_of_key_t,"op1_stage1 is: %b \n",result_of_caesar_t,"op2_stage1 is: %s \n",result_of_xor_ascii_t ,"op3_stage1 is: %s \n",result_of_shift_right_t,"Cipher1: %s \n",result_of_swapping_t," **END OF STAGE 1/TEXT1**\n \n ");
+        
+        
+        
+        
+        #16000 $display ("**SECOND CLK CYCLE** \n","//Tracing of text1// \n ROUND2/STAGE2 \n sec_char_of_key: %s \n",sec_char_of_key_t,"op1_stage2 %b  \n",result_of_caesar_stage2_t," op2-stage2: %s \n ",result_of_xor_ascii_stage2_t,"op3_stage2: %s \n",result_of_shift_right_stage2_t," cipher2: %s \n \n",result_of_swapping_stage2_t,"//Tracing for text2:// \n Memory stage: \n","Partial_Text is: %s \n",text_tracing_t,"Partial_key is: %s \n",key_tracing_t,"ROUND1/STAGE1 \n first_char_of_key: %s  \n",first_char_of_key_t,"op1_stage1 is: %b \n",result_of_caesar_t,"op2_stage1 is: %s \n",result_of_xor_ascii_t ,"op3_stage1 is: %s \n",result_of_shift_right_t,"Cipher1: %s \n",result_of_swapping_t," **END OF STAGE 2/TEXT1  && END OF STAGE1 TEXT2**\n \n ");
+       
+        
+        
+        #16000 $display ("**THIRD CLK CYCLE:** \n","//Tracing for text1// \n ROUND3/STAGE3 \n third_char_key: %s \n",third_char_key_t,"op1_stage3: %b \n",result_of_caesar_stage3_t,"op2_stage3: %s \n",result_of_xor_ascii_stage3_t,"op3_stage3: %s \n",result_of_shift_right_stage3_t,"cipher3: %s \n",result_of_swapping_stage3_t,"//Tracing for text2// \n","sec_char_of_key: %s \n",sec_char_of_key_t,"op1_stage2: %b \n",result_of_caesar_stage2_t,"op2_stage2: %s \n", result_of_xor_ascii_stage2_t,"op3_stage2: %s \n",result_of_shift_right_stage2_t," cipher2: %s \n",result_of_swapping_stage2_t,"//Tracing for text3// \n Memory stage: \n Partial_text is: %s \n",text_tracing_t,"Partial_key is: %s \n",key_tracing_t,"op1_stage1: %b \n",result_of_caesar_t,"op2_stage1:  %s \n",result_of_xor_ascii_t ,"op3_stage1: %s \n",result_of_shift_right_t,"cipher1: %s \n",result_of_swapping_t," **END OF STAGE3/TEXT1  &&  END OF STGE2/TEXT2 && END OF STAGE1/TEXT3** \n \n");
+       
+        #16000 $display ("** FOURTH CLK CYCLE** \n text4 is %s \n", text_tracing_t," key of text4 is: %s \n", key_tracing_t);
+        
+          
+        #16000 $display ("** FIFTH CLK CYCLE** \n text5 is %s \n", text_tracing_t," key of text5 is: %s \n", key_tracing_t);
+        
+        
+        
+         
+        #16000 $display ("** SISXTH CLK CYCLE** \n text6 is %s \n", text_tracing_t," key of text6 is: %s \n", key_tracing_t,"CIPHER TEXT OF TEXT1 IS--->  %s \n",cipher_5_read_from_flipflop_t);
+        
+        #16000 $display ("** SEVENTH CLK CYCLE** \n text7 is %s \n", text_tracing_t," key of text7 is: %s \n", key_tracing_t,"CIPHER TEXT OF TEXT2 IS--->  %s \n",cipher_5_read_from_flipflop_t);
+        
+        
+        
+        #16000 $display("**EIGHTH CLK CYCLE:** \n","CIPPHER TEXT OF TEXT3 IS--->  %s \n",cipher_5_read_from_flipflop_t);
+        
+        #16000 $display("**NINTH CLK CYCLE:** \n","CIPPHER TEXT OF TEXT4 IS--->  %s \n",cipher_5_read_from_flipflop_t);
+        
+        #16000 $display("**TENTH CLK CYCLE:** \n","CIPPHER TEXT OF TEXT5 IS--->  %s \n",cipher_5_read_from_flipflop_t);
+        
+        #16000 $display("**ELEVENTH CLK CYCLE:** \n","CIPPHER TEXT OF TEXT6 IS--->  %s \n",cipher_5_read_from_flipflop_t);
+        
+        #16000 $display("**TWELVTH CLK CYCLE:** \n","CIPPHER TEXT OF TEXT7 IS--->  %s \n",cipher_5_read_from_flipflop_t);
+        
+     
+       
+      #400000  $finish;  
+    
+        
+      end
+endmodule
+
+
+
+
+
+
+
