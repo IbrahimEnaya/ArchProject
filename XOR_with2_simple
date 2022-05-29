@@ -1,0 +1,41 @@
+module tst;
+  
+  reg [7:0] in1_t;
+  reg [7:0] in2_t;
+  
+  wire [7:0] out_t;
+  
+  
+  xorr test(out_t,in1_t);
+  initial
+    begin
+      in1_t=1;
+      #1 $display (" %b ",in1_t, "  %b  ",out_t); 
+      
+      
+      in1_t=5;
+      #1 $display (" %b ",in1_t,"  %b ",out_t); 
+      
+
+    end
+endmodule
+	module xorr(out,in);
+  output [7:0] out;
+  input [7:0]in;
+  input [7:0]x;
+  assign x=2;
+
+  
+  xor a(out[0],x[0],in[0]);
+  xor b(out[1],x[1],in[1]);
+  xor c(out[2],x[2],in[2]);
+  xor d(out[3],x[3],in[3]);
+  xor e(out[4],x[4],in[4]);
+  xor f(out[5],x[5],in[5]);
+  xor g(out[6],x[6],in[6]);
+  xor h(out[7],x[7],in[7]);
+
+  
+endmodule
+
+
