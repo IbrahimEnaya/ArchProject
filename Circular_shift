@@ -1,0 +1,26 @@
+module testb;
+  reg [127:0] inpt1; 
+  wire [127:0] outp; 
+   
+  RightShift a1(inpt1,outp); 
+ 
+initial begin  
+ 
+inpt1 = "TalaIbrahimArch2";   
+#1 
+  $display($time," %s ",inpt1," %s ",outp); 
+ 
+
+ 
+end 
+ endmodule
+
+	module RightShift(in1,outp); 
+  input  [127:0] in1;
+  output [127:0] outp;
+  wire [7:0] temp ;
+  assign temp =in1[7:0]; 
+  assign outp={temp,in1[127:8]}; //or assign outp=in1>>1;  
+
+endmodule
+
